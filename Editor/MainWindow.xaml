@@ -1,0 +1,359 @@
+﻿<Window x:Class="Editor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:fsdata="clr-namespace:FSEditor.FSData;assembly=Lib"
+        xmlns:local="clr-namespace:Editor"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        Name="WinA"
+        mc:Ignorable="d" 
+        Title="Fortune Avenue"
+        Width="800"  Height="600"
+        MinWidth="800" MinHeight="600" 
+        d:DataContext="{d:DesignInstance Type=fsdata:BoardFile}"
+        Loaded="Window_Loaded">
+    <Window.Resources>
+        <local:NullToFalseConverter x:Key="NullToFalseConverter"/>
+        <local:ShopComboBoxConverter x:Key="ShopComboBoxConverter"/>
+        <local:SquareComboBoxConverter x:Key="SquareComboBoxConverter"/>
+    </Window.Resources>
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Top" Background="#ffebebeb" LastChildFill="False">
+            <Menu>
+                <MenuItem Header="File">
+                    <MenuItem Header="New"  Click="New_Click"/>
+                    <Separator/>
+                    <MenuItem Header="Open..." Click="Open_Click"/>
+                    <Separator/>
+                    <MenuItem Header="Save" Click="Save_Click"/>
+                    <MenuItem Header="Save As..." Click="SaveAs_Click" />
+                    <Separator/>
+                    <MenuItem Header="Exit" Click="Exit_Click"/>
+                </MenuItem>
+                <MenuItem Header="Tools">
+                   <MenuItem Header="Create Paths" Click="Autopath_Click"/>
+                   <MenuItem Header="Verify Board" Click="Verify_Click"/>
+                </MenuItem>
+                <MenuItem Header="Help">
+                    <MenuItem Header="Show Help Dialog" Click="Help_Click"/>
+                    <MenuItem Header="About" Click="About_Click"/>
+                </MenuItem>
+            </Menu>
+            <Slider Name="PART_Zoom" Minimum=".1" Value="1" Maximum="3" Width="580" DockPanel.Dock="Right" Margin="4,0"/>
+            <TextBlock Text="{Binding ElementName=PART_Zoom, Path=Value, StringFormat=Zoom: \{0:P\}}" Margin="4,0"
+                       VerticalAlignment="Center" DockPanel.Dock="Right" MouseLeftButtonDown="PART_ResetZoom">
+                <TextBlock.ToolTip>
+                        <TextBlock>Click to reset zoom to 100%</TextBlock>
+                </TextBlock.ToolTip>
+            </TextBlock>
+        </DockPanel>
+        <DockPanel DockPanel.Dock="Bottom">
+            <StatusBar>
+                Ready
+            </StatusBar>
+        </DockPanel>
+        <Grid IsEnabled="{Binding Converter={StaticResource NullToFalseConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="398*" />
+                <ColumnDefinition Width="220" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Column="0" Grid.RowSpan="2" DataContext="{Binding Path=BoardInfo}">
+                <HeaderedContentControl Header="Initial Cash" Margin="2">
+                    <TextBox Text="{Binding Path=InitialCash}" />
+                </HeaderedContentControl>
+                <HeaderedContentControl Header="Target Amount" Margin="2">
+                <TextBox Text="{Binding Path=TargetAmount}" />
+                </HeaderedContentControl>
+                <HeaderedContentControl Header="Base Salary" Margin="2">
+                    <TextBox Text="{Binding Path=BaseSalary}" />
+                </HeaderedContentControl>
+                <HeaderedContentControl Header="Salary Increment" Margin="2">
+                    <TextBox Text="{Binding Path=SalaryIncrement}" />
+                </HeaderedContentControl>
+                <HeaderedContentControl Header="Maximum Dice Roll" Margin="2">
+                    <TextBox Text="{Binding Path=MaxDiceRoll}"/>
+                </HeaderedContentControl>
+                <Button Content="Add Square" Click="Add_Click" Margin="2,16,2,2"/>
+                <Button Content="Remove Square" Click="Remove_Click" Margin="2,2,2,16"
+                        IsEnabled="{Binding ElementName=PART_Squares, Path=SelectedItem, Converter={StaticResource NullToFalseConverter}}"
+                        />
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2">
+                    <CheckBox Name="SnapCheckBox" Content="Snap to: " VerticalAlignment="Center" Checked="SnapCheck" Unchecked="SnapCheck"/>
+                    <TextBox Name="SnapTextBox" Width="24" Text="16" TextChanged="SnapCheck" Margin="2,0,0,0"/>
+                </StackPanel>
+                <Button Name="SnapAllButton" Content="Snap All Squares" Margin="2,2,2,16" Click="SnapAll_Click" IsEnabled="False"/>
+
+                <HeaderedContentControl Header="Legend:" Margin="0,2,0,0">
+                    <StackPanel>
+                    <Grid Width="64" Height="64">
+                        <Image Source="/Editor;component/Images/GroundProperty.png"/>
+                        <Border BorderBrush="Black" BorderThickness="1"/>
+                            <TextBlock Text="Value" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontSize="16" Foreground="White" Background="#7F000000"/>
+                            <TextBlock Text="Price" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                                       FontSize="12" Foreground="White" Background="#7F000000"/>
+                            <TextBlock Text="Id" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                       FontSize="12" Foreground="White" Background="#7F000000"/>
+                    </Grid>
+                        <TextBlock Text="Selected will have a white border." TextWrapping="Wrap" />
+                        <TextBlock Text="Properties will show district color." TextWrapping="Wrap" />
+                    </StackPanel>
+                </HeaderedContentControl>
+            </StackPanel>
+
+            <ListBox Grid.Column="1" Grid.RowSpan="2" ItemsSource="{Binding BoardData.Squares}" x:Name="PART_Squares" 
+                 ScrollViewer.VerticalScrollBarVisibility="Visible"
+                 ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                <ListBox.Resources>
+                    <local:OffsetConverter x:Key="OffsetConverter"/>
+                    <local:DistrictConverter x:Key="DistrictConverter"/>
+                    <local:SquareConverter x:Key="SquareConverter"/>
+                </ListBox.Resources>
+                <ListBox.Style>
+                    <Style TargetType="ListBox" BasedOn="{x:Null}">
+                        <Setter Property="OverridesDefaultStyle" Value="True"/>
+                        <Setter Property="Padding" Value="1"/>
+                        <Setter Property="Background" Value="#FFFFFFFF" />
+                        <Setter Property="Foreground" Value="#FF000000"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Setter Property="VerticalContentAlignment" Value="Top" />
+                        <Setter Property="IsTabStop" Value="False" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+                        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                        <Setter Property="BorderBrush">
+                            <Setter.Value>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#FFA3AEB9" Offset="0"/>
+                                    <GradientStop Color="#FF8399A9" Offset="0.375"/>
+                                    <GradientStop Color="#FF718597" Offset="0.375"/>
+                                    <GradientStop Color="#FF617584" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBox">
+                                        <Border CornerRadius="2" 
+			                BorderBrush="{TemplateBinding BorderBrush}"
+			                BorderThickness="{TemplateBinding BorderThickness}">
+                                            <ScrollViewer x:Name="ScrollViewer" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="0">
+                                                <ItemsPresenter />
+                                            </ScrollViewer>
+                                        </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.Style>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <local:DragCanvas IsItemsHost="True" 
+                            Width="2048"
+                            Height="2048">
+                            <local:DragCanvas.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding ElementName=PART_Zoom, Path=Value}"
+                                                ScaleY="{Binding ElementName=PART_Zoom, Path=Value}"/>
+                            </local:DragCanvas.LayoutTransform>
+                        </local:DragCanvas>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Canvas.Left" Value="{Binding Position.X, Converter={StaticResource OffsetConverter}, ConverterParameter=1024, Mode=TwoWay}"/>
+                        <Setter Property="Canvas.Top" Value="{Binding Position.Y, Converter={StaticResource OffsetConverter}, ConverterParameter=1024, Mode=TwoWay}"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="64" Height="64">
+                            <Image>
+                                <Image.Style>
+                                    <Style TargetType="Image">
+                                        <Setter Property="Source" Value="{Binding SquareType, Converter={StaticResource SquareConverter}}"/>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                            <Border>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Black"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SquareType}" Value="{x:Static fsdata:SquareType.Property}">
+                                            <Setter Property="BorderThickness" Value="3"/>
+                                            <Setter Property="BorderBrush" Value="{Binding DistrictDestinationId, Converter={StaticResource DistrictConverter}}"/>
+                                        </DataTrigger>
+                                            <DataTrigger Binding="{Binding SquareType}" Value="{x:Static fsdata:SquareType.VacantPlot}">
+                                            <Setter Property="BorderThickness" Value="3"/>
+                                            <Setter Property="BorderBrush" Value="{Binding DistrictDestinationId, Converter={StaticResource DistrictConverter}}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                            <Setter Property="BorderThickness" Value="3"/>
+                                            <Setter Property="BorderBrush" Value="White"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+                            <TextBlock Text="{Binding Path=Value}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontSize="16" FontWeight="Bold" Foreground="White" Background="#7F000000">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SquareType}" Value="{x:Static fsdata:SquareType.Property}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock Text="{Binding Path=Price}" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                                       FontSize="12" Foreground="White" Background="#7F000000">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SquareType}" Value="{x:Static fsdata:SquareType.Property}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock Text="{Binding Path=Id}" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                       FontSize="12" Foreground="White" Background="#7F000000"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <HeaderedContentControl Header="Id" Grid.Column="2" Grid.Row="0" Margin="2,0,2,0">
+                <TextBlock DataContext="{Binding ElementName=PART_Squares, Path=SelectedItem}" Text="{Binding Id}" FontWeight="Bold" Margin="4,0,0,0" />
+            </HeaderedContentControl>
+            <TabControl Grid.Column="2" Grid.Row="1">
+                <TabItem Header="Information">
+            <StackPanel DataContext="{Binding ElementName=PART_Squares, Path=SelectedItem}"
+                        IsEnabled="{Binding Converter={StaticResource NullToFalseConverter}}">
+
+
+                        <HeaderedContentControl Header="Type">
+                            <ComboBox Name="TypeComboBox" SelectedItem="{Binding SquareType, Converter={StaticResource SquareComboBoxConverter}, Mode=TwoWay}"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Position (X, Y)" Margin="0,2,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding Position.X}"/>
+                                <TextBox Grid.Column="1" Text="{Binding Position.Y}"/>
+                            </Grid>
+                        </HeaderedContentControl>
+
+                        <HeaderedContentControl Header="District / Destination Square ID" Margin="0,2,0,0">
+                            <TextBox Text="{Binding DistrictDestinationId}"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Initial Value" Margin="0,2,0,0">
+                            <TextBox Text="{Binding Value}"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Initial Shop Payment Price" Margin="0,2,0,0">
+                            <TextBox Text="{Binding Price}"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Shop Model" Margin="0,2,0,0">
+                            <ComboBox Name="ShopComboBox" SelectedItem="{Binding ShopModelId, Converter={StaticResource ShopComboBoxConverter}, Mode=TwoWay}"/>
+                        </HeaderedContentControl>
+            </StackPanel>
+                    
+                </TabItem>
+                <TabItem Header="Waypoints">
+                <StackPanel DataContext="{Binding ElementName=PART_Squares, Path=SelectedItem}"
+                        IsEnabled="{Binding Converter={StaticResource NullToFalseConverter}}">
+                <HeaderedContentControl Header="Waypoint 1" DataContext="{Binding Waypoint1}">
+                    <StackPanel Margin="4, 0,0,0">
+                        <HeaderedContentControl Header="Entry Square ID">
+                            <TextBox Text="{Binding EntryId}"/>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Destination Square IDs">
+                             <Grid>
+                                 <Grid.ColumnDefinitions>
+                                     <ColumnDefinition Width="*"/>
+                                     <ColumnDefinition Width="*"/>
+                                     <ColumnDefinition Width="*"/>
+                                 </Grid.ColumnDefinitions>
+                                 <TextBox Grid.Column="0" Text="{Binding Destination1}"/>
+                                 <TextBox Grid.Column="1" Text="{Binding Destination2}"/>
+                                 <TextBox Grid.Column="2" Text="{Binding Destination3}"/>
+                             </Grid>
+                        </HeaderedContentControl>
+                    </StackPanel>
+                </HeaderedContentControl>
+                        <HeaderedContentControl Header="Waypoint 2" DataContext="{Binding Waypoint2}" Margin="0,8,0,0">
+                            <StackPanel Margin="4, 0,0,0">
+                                <HeaderedContentControl Header="Entry Square ID">
+                                    <TextBox Text="{Binding EntryId}"/>
+                                </HeaderedContentControl>
+                                <HeaderedContentControl Header="Destination Square IDs">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox Grid.Column="0" Text="{Binding Destination1}"/>
+                                        <TextBox Grid.Column="1" Text="{Binding Destination2}"/>
+                                        <TextBox Grid.Column="2" Text="{Binding Destination3}"/>
+                                    </Grid>
+                                </HeaderedContentControl>
+                            </StackPanel>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Waypoint 3" DataContext="{Binding Waypoint3}" Margin="0,8,0,0">
+                            <StackPanel Margin="4, 0,0,0">
+                                <HeaderedContentControl Header="Entry Square ID">
+                                    <TextBox Text="{Binding EntryId}"/>
+                                </HeaderedContentControl>
+                                <HeaderedContentControl Header="Destination Square IDs">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox Grid.Column="0" Text="{Binding Destination1}"/>
+                                        <TextBox Grid.Column="1" Text="{Binding Destination2}"/>
+                                        <TextBox Grid.Column="2" Text="{Binding Destination3}"/>
+                                    </Grid>
+                                </HeaderedContentControl>
+                            </StackPanel>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Waypoint 4" DataContext="{Binding Waypoint4}" Margin="0,8,0,0">
+                            <StackPanel Margin="4, 0,0,0">
+                                <HeaderedContentControl Header="Entry Square ID">
+                                    <TextBox Text="{Binding EntryId}"/>
+                                </HeaderedContentControl>
+                                <HeaderedContentControl Header="Destination Square IDs">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox Grid.Column="0" Text="{Binding Destination1}"/>
+                                        <TextBox Grid.Column="1" Text="{Binding Destination2}"/>
+                                        <TextBox Grid.Column="2" Text="{Binding Destination3}"/>
+                                    </Grid>
+                                </HeaderedContentControl>
+                            </StackPanel>
+                        </HeaderedContentControl>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </DockPanel>
+</Window>

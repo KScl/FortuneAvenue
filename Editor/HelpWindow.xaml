@@ -1,0 +1,165 @@
+﻿<Window x:Class="Editor.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Help" Height="490" Width="432">
+    <TabControl>
+        <TabItem Header="Basic Controls">
+            <StackPanel>
+                <TextBlock Margin="0,0,0,8" Text="Square Grid:" TextWrapping="Wrap" />
+                <TextBlock Margin="8,0,0,0" Text="Squares can be selected by left clicking on them"/>
+                <TextBlock Margin="8,0,0,0" Text="Squares can be moved by right click dragging them"/>
+                <TextBlock Margin="8,0,0,8" Text="Details about a square can be changed once they are selected"/>
+
+                <TextBlock Margin="0,0,0,8" Text="Auto path:" TextWrapping="Wrap" />
+                <TextBlock Margin="8,0,0,0" Text="Click the Autopath menu item"/>
+                <TextBlock Margin="8,0,0,0" Text="Squares are automatically connected to up to 4 nearby squares"/>
+                <TextBlock Margin="8,0,0,0" Text="Squares must be touching for autopathing to connect them"/>
+                <TextBlock Margin="8,0,0,8" Text="Additional nearby squares are ignored"/>
+
+                <TextBlock Margin="0,0,0,0" Text="Board Verification can be done by hitting the Verify Board button."/>
+                <TextBlock Margin="0,0,0,0" Text="This will check the board for errors that might crash the game or yield"/>
+                <TextBlock Margin="0,0,0,8" Text="unwanted behavior."/>
+
+                <TextBlock Margin="0,0,0,8" Text="To play levels:" TextWrapping="Wrap" />
+                <TextBlock Margin="8,0,0,0" Text="Use WiiScrubber to replace a level within the /Partition0/Param/ folder"/>
+                <TextBlock Margin="8,0,0,0" Text="Note that levels with o_ prefix are easy mode levels"/>
+                <TextBlock Margin="8,0,0,8" Text="Note that Target Amount is ignored by the game..."/>
+
+                <TextBlock Margin="0,0,0,8" Text="Known Issues:" TextWrapping="Wrap" />
+                <TextBlock Margin="8,0,0,0" Text="Some maps do not require every tile to be touching such as the Galaxy"/>
+                <TextBlock Margin="8,0,0,8" Text="Only specific backgrounds allow Switches and Lifts."/>
+
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="Making a Path">
+            <StackPanel>
+                <Image Source="/Editor;component/Images/Path.jpg" Width="128" Height="128" />
+                <TextBlock Text="Paths are created by specifying where the player is allowed to move if they've come from a given tile. For example the above picture square 18 would have a waypoint that looks like the following." TextWrapping="Wrap" />
+                <HeaderedContentControl Header="Waypoint1" DataContext="{Binding Waypoint1}">
+                    <StackPanel Margin="4, 0,0,0">
+                        <HeaderedContentControl Header="EntryId">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox IsReadOnly="True" Text="19" Width="100"/>
+                                <TextBlock Text="Square that the player was on Previously"/>
+                            </StackPanel>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Destination1">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox IsReadOnly="True" Text="17" Width="100"/>
+                                <TextBlock Text="Destiniation choice 1"/>
+                            </StackPanel>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Destination2">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox IsReadOnly="True" Text="255" Width="100"/>
+                                <TextBlock Text="Destination choice 2 (Use 255 to disable)"/>
+                            </StackPanel>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Destination3">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox IsReadOnly="True" Text="255" Width="100"/>
+                                <TextBlock Text="Destination choice 3 (Use 255 to disable)"/>
+                            </StackPanel>
+                        </HeaderedContentControl>
+                        <TextBlock Text="This shows that if you are currently on Square 18 and you came from Square 19 then you are only allowed to go to Square 17." TextWrapping="Wrap"/>
+                    </StackPanel>
+                </HeaderedContentControl>
+                </StackPanel>
+        </TabItem>
+        <TabItem Header="Fortune Street Board Files">
+        <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="19" Grid.ColumnSpan="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Boards with a prefix of 'o_' are used for Easy rules. " />
+                <TextBlock Grid.Row="20" Grid.ColumnSpan="3" VerticalAlignment="Top" HorizontalAlignment="Center" Text="Boards lacking that prefix are used for Standard rules." />
+
+                <!-- Dragon Quest -->
+                <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="torodeen.frb" />
+                <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Trodain Castle" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="angel(0/1/2/3).frb" />
+                <TextBlock Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="The Observatory" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="yuureisen.frb" />
+                <TextBlock Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Ghost Ship" />
+
+                <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="slabakkatou.frb" />
+                <TextBlock Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Slimenia" />
+            
+                <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="volcano(0/1).frb" />
+                <TextBlock Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Mt. Magmageddon" />
+            
+                <TextBlock Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="kandata.frb" />
+                <TextBlock Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Robbin' Hood Ruins" />
+ 
+                <!-- Mario -->
+                <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="studium.frb" />
+                <TextBlock Grid.Row="6" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Mario Stadium" />
+            
+                <TextBlock Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="mooncity.frb" />
+                <TextBlock Grid.Row="7" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Starship Mario" />
+            
+                <TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="circuit.frb" />
+                <TextBlock Grid.Row="8" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Mario Circuit" />
+            
+                <TextBlock Grid.Row="9" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="yosshi.frb" />
+                <TextBlock Grid.Row="9" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Yoshi's Island" />
+            
+                <TextBlock Grid.Row="10" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="dolpic.frb" />
+                <TextBlock Grid.Row="10" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Delfino Plaza" />
+
+                <TextBlock Grid.Row="11" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="???.frb" />
+                <TextBlock Grid.Row="11" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Peach's Castle" />
+
+                <!-- Special -->
+                <TextBlock Grid.Row="12" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="alephgard.frb" />
+                <TextBlock Grid.Row="12" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Alefgard" />
+            
+                <TextBlock Grid.Row="13" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="mario.frb" />
+                <TextBlock Grid.Row="13" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Super Mario Bros." />
+            
+                <TextBlock Grid.Row="14" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="koopa.frb" />
+                <TextBlock Grid.Row="14" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Bowser's Castle" />
+            
+                <TextBlock Grid.Row="15" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="colony.frb" />
+                <TextBlock Grid.Row="15" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Good Egg Galaxy" />
+            
+                <TextBlock Grid.Row="16" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="majinzo(0/1).frb" />
+                <TextBlock Grid.Row="16" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="The Colossus" />
+            
+                <TextBlock Grid.Row="17" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="dahma.frb" />
+                <TextBlock Grid.Row="17" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Alltrades Abbey" />
+
+                <!-- Practice -->
+                <TextBlock Grid.Row="18" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="tutorial.frb" />
+                <TextBlock Grid.Row="18" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Practice Board" />
+            </Grid>
+        </TabItem>
+    </TabControl>
+</Window>
