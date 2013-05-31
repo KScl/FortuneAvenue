@@ -35,7 +35,7 @@
                    <MenuItem Header="Create Paths" Click="Autopath_Click"/>
                    <MenuItem Header="Verify Board" Click="Verify_Click"/>
                 </MenuItem>
-                <MenuItem Header="Help">
+                <MenuItem Header="Help" Click="MenuItem_Click">
                     <MenuItem Header="Show Help Dialog" Click="Help_Click"/>
                     <MenuItem Header="About" Click="About_Click"/>
                 </MenuItem>
@@ -55,8 +55,8 @@
         </DockPanel>
         <Grid IsEnabled="{Binding Converter={StaticResource NullToFalseConverter}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100" />
-                <ColumnDefinition Width="398*" />
+                <ColumnDefinition Width="129" />
+                <ColumnDefinition Width="429*" />
                 <ColumnDefinition Width="220" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -79,6 +79,13 @@
                 <HeaderedContentControl Header="Maximum Dice Roll" Margin="2">
                     <TextBox Text="{Binding Path=MaxDiceRoll}"/>
                 </HeaderedContentControl>
+                <HeaderedContentControl Header="Looping Mode" Margin="2">
+                    <StackPanel>
+                        <RadioButton Name="GalaxyNLoop" Checked="Galaxy_Click">No Looping</RadioButton>
+                        <RadioButton Name="GalaxyVLoop" Checked="Galaxy_Click">Vertical (SMG)</RadioButton>
+                        <RadioButton Name="GalaxyVHLoop" Checked="Galaxy_Click">Vert+Horiz (glitchy)</RadioButton>
+                    </StackPanel>
+                </HeaderedContentControl>
                 <Button Content="Add Square" Click="Add_Click" Margin="2,16,2,2"/>
                 <Button Content="Remove Square" Click="Remove_Click" Margin="2,2,2,16"
                         IsEnabled="{Binding ElementName=PART_Squares, Path=SelectedItem, Converter={StaticResource NullToFalseConverter}}"
@@ -89,7 +96,7 @@
                 </StackPanel>
                 <Button Name="SnapAllButton" Content="Snap All Squares" Margin="2,2,2,16" Click="SnapAll_Click" IsEnabled="False"/>
 
-                <HeaderedContentControl Header="Legend:" Margin="0,2,0,0">
+                <HeaderedContentControl Header="Legend:" Margin="0,2,0,0" ClipToBounds="False">
                     <StackPanel>
                     <Grid Width="64" Height="64">
                         <Image Source="/Editor;component/Images/GroundProperty.png"/>
@@ -109,7 +116,7 @@
 
             <ListBox Grid.Column="1" Grid.RowSpan="2" ItemsSource="{Binding BoardData.Squares}" x:Name="PART_Squares" 
                  ScrollViewer.VerticalScrollBarVisibility="Visible"
-                 ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                 ScrollViewer.HorizontalScrollBarVisibility="Visible" Background="#FFF0F0F0" ClipToBounds="True">
                 <ListBox.Resources>
                     <local:OffsetConverter x:Key="OffsetConverter"/>
                     <local:DistrictConverter x:Key="DistrictConverter"/>

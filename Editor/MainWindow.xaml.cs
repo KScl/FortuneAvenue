@@ -164,6 +164,29 @@ namespace Editor
                 this.Title = "Fortune Avenue - [" + loneFileName + "]";
         }
 
+        private void UpdateGalaxyRadio()
+        {
+            var board = ((BoardFile)this.DataContext);
+
+            switch (board.BoardInfo.GalaxyStatus)
+            {
+                case 0:
+                    this.GalaxyNLoop.IsChecked = true;
+                    break;
+                case 1:
+                    this.GalaxyVHLoop.IsChecked = true;
+                    break;
+                case 2:
+                    this.GalaxyVLoop.IsChecked = true;
+                    break;
+                default:
+                    this.GalaxyNLoop.IsChecked = false;
+                    this.GalaxyVLoop.IsChecked = false;
+                    this.GalaxyVHLoop.IsChecked = false;
+                    break;
+            }
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             var border = (Border)VisualTreeHelper.GetChild(PART_Squares, 0);
@@ -193,6 +216,7 @@ namespace Editor
             var Board = BoardFile.LoadDefault();
             this.DataContext = Board;
             UpdateTitle();
+            UpdateGalaxyRadio();
         }
 
         // Corresponds to "File/Open"
@@ -217,6 +241,7 @@ namespace Editor
                 this.DataContext = Board;
             }
             UpdateTitle();
+            UpdateGalaxyRadio();
         }
 
         // Corresponds to "File/Save"
@@ -523,7 +548,8 @@ namespace Editor
         // Corresponds to "Help/About"
         private void About_Click(object sender, RoutedEventArgs e)
         {
-            // no-op
+            var aboutBox = new AboutBox();
+            aboutBox.ShowDialog();
         }
 
         #endregion //Help Menu
@@ -648,6 +674,31 @@ namespace Editor
             if (x < 0)
                 return (short)(((x - (y / 2)) / y) * y);
             return (short)(((x + (y / 2)) / y) * y);
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Galaxy_Click(object sender, RoutedEventArgs e)
+        {
+            var board = ((BoardFile)this.DataContext);
+
+            if ((bool)this.GalaxyNLoop.IsChecked)
+            {
+                board.BoardInfo.GalaxyStatus = 0;
+            }
+            else if ((bool)this.GalaxyVLoop.IsChecked)
+            {
+                board.BoardInfo.GalaxyStatus = 2;
+            }
+            else if ((bool)this.GalaxyVHLoop.IsChecked)
+            {
+                board.BoardInfo.GalaxyStatus = 1;
+            }
+
+            UpdateGalaxyRadio();
         }
     }
 }
