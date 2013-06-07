@@ -144,7 +144,7 @@ namespace Editor
         public static Int16 Snap { get; private set; }
         private String currentFileName = null; // Includes position, used for File/Save
         private String loneFileName = null; // File name only, used for titlebar
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -676,11 +676,6 @@ namespace Editor
             return (short)(((x + (y / 2)) / y) * y);
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void Galaxy_Click(object sender, RoutedEventArgs e)
         {
             var board = ((BoardFile)this.DataContext);
@@ -697,8 +692,6 @@ namespace Editor
             {
                 board.BoardInfo.GalaxyStatus = 1;
             }
-
-            UpdateGalaxyRadio();
         }
     }
 }

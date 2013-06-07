@@ -17,6 +17,21 @@
         <local:NullToFalseConverter x:Key="NullToFalseConverter"/>
         <local:ShopComboBoxConverter x:Key="ShopComboBoxConverter"/>
         <local:SquareComboBoxConverter x:Key="SquareComboBoxConverter"/>
+        <DrawingBrush x:Key="CanvasAxes">
+            <DrawingBrush.Drawing>
+                <GeometryDrawing>
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <LineGeometry StartPoint="0,1058" EndPoint="2048,1058" />
+                            <LineGeometry StartPoint="1061,0" EndPoint="1061,2048" />
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                    <GeometryDrawing.Pen>
+                        <Pen Thickness="1" Brush="Gray" />
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
     </Window.Resources>
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" Background="#ffebebeb" LastChildFill="False">
@@ -35,14 +50,15 @@
                    <MenuItem Header="Create Paths" Click="Autopath_Click"/>
                    <MenuItem Header="Verify Board" Click="Verify_Click"/>
                 </MenuItem>
-                <MenuItem Header="Help" Click="MenuItem_Click">
+                <MenuItem Header="Help">
                     <MenuItem Header="Show Help Dialog" Click="Help_Click"/>
                     <MenuItem Header="About" Click="About_Click"/>
                 </MenuItem>
             </Menu>
-            <Slider Name="PART_Zoom" Minimum=".1" Value="1" Maximum="3" Width="580" DockPanel.Dock="Right" Margin="4,0"/>
+            <CheckBox x:Name="DrawAxes" DockPanel.Dock="Right" Width="79" Margin="4,0" VerticalAlignment="Center">Draw Axes</CheckBox>
+            <Slider Name="PART_Zoom" Minimum=".1" Value="1" Maximum="3" Width="490" DockPanel.Dock="Right" Margin="4,0" ClipToBounds="False" />
             <TextBlock Text="{Binding ElementName=PART_Zoom, Path=Value, StringFormat=Zoom: \{0:P\}}" Margin="4,0"
-                       VerticalAlignment="Center" DockPanel.Dock="Right" MouseLeftButtonDown="PART_ResetZoom">
+                       VerticalAlignment="Center" DockPanel.Dock="Right" MouseLeftButtonDown="PART_ResetZoom" Width="75">
                 <TextBlock.ToolTip>
                         <TextBlock>Click to reset zoom to 100%</TextBlock>
                 </TextBlock.ToolTip>
@@ -126,7 +142,7 @@
                     <Style TargetType="ListBox" BasedOn="{x:Null}">
                         <Setter Property="OverridesDefaultStyle" Value="True"/>
                         <Setter Property="Padding" Value="1"/>
-                        <Setter Property="Background" Value="#FFFFFFFF" />
+                        <Setter Property="Background" Value="#FFF0F0F0" />
                         <Setter Property="Foreground" Value="#FF000000"/>
                         <Setter Property="HorizontalContentAlignment" Value="Left" />
                         <Setter Property="VerticalContentAlignment" Value="Top" />
@@ -163,7 +179,7 @@
                     <ItemsPanelTemplate>
                         <local:DragCanvas IsItemsHost="True" 
                             Width="2048"
-                            Height="2048">
+                            Height="2048" x:Name="BoardCanvas" Background="{StaticResource CanvasAxes}">
                             <local:DragCanvas.LayoutTransform>
                                 <ScaleTransform ScaleX="{Binding ElementName=PART_Zoom, Path=Value}"
                                                 ScaleY="{Binding ElementName=PART_Zoom, Path=Value}"/>
@@ -179,7 +195,7 @@
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid Width="64" Height="64">
+                        <Grid MaxWidth="64" MaxHeight="64">
                             <Image>
                                 <Image.Style>
                                     <Style TargetType="Image">
@@ -188,27 +204,27 @@
                                 </Image.Style>
                             </Image>
                             <Border>
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="BorderBrush" Value="Black"/>
-                                    <Setter Property="BorderThickness" Value="1"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SquareType}" Value="{x:Static fsdata:SquareType.Property}">
-                                            <Setter Property="BorderThickness" Value="3"/>
-                                            <Setter Property="BorderBrush" Value="{Binding DistrictDestinationId, Converter={StaticResource DistrictConverter}}"/>
-                                        </DataTrigger>
-                                            <DataTrigger Binding="{Binding SquareType}" Value="{x:Static fsdata:SquareType.VacantPlot}">
-                                            <Setter Property="BorderThickness" Value="3"/>
-                                            <Setter Property="BorderBrush" Value="{Binding DistrictDestinationId, Converter={StaticResource DistrictConverter}}"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
-                                            <Setter Property="BorderThickness" Value="3"/>
-                                            <Setter Property="BorderBrush" Value="White"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                        </Border>
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="BorderBrush" Value="Black"/>
+                                        <Setter Property="BorderThickness" Value="1"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SquareType}" Value="{x:Static fsdata:SquareType.Property}">
+                                                <Setter Property="BorderThickness" Value="3"/>
+                                                <Setter Property="BorderBrush" Value="{Binding DistrictDestinationId, Converter={StaticResource DistrictConverter}}"/>
+                                            </DataTrigger>
+                                                <DataTrigger Binding="{Binding SquareType}" Value="{x:Static fsdata:SquareType.VacantPlot}">
+                                                <Setter Property="BorderThickness" Value="3"/>
+                                                <Setter Property="BorderBrush" Value="{Binding DistrictDestinationId, Converter={StaticResource DistrictConverter}}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                                <Setter Property="BorderThickness" Value="3"/>
+                                                <Setter Property="BorderBrush" Value="White"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
                             <TextBlock Text="{Binding Path=Value}" HorizontalAlignment="Center" VerticalAlignment="Center"
                                        FontSize="16" FontWeight="Bold" Foreground="White" Background="#7F000000">
                                 <TextBlock.Style>
