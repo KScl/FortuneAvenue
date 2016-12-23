@@ -418,7 +418,7 @@ namespace Editor
 
             MessageBox.Show("Autopathed entire map");
         }
-        
+
         // Corresponds to "Tools/Verify Board"
         private void Verify_Click(object sender, RoutedEventArgs e)
         {
@@ -438,7 +438,7 @@ namespace Editor
 
             // Clearly not a requirement
             if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.Bank) != 1)
-                errsb.AppendFormat("W{0}: There should be exactly one Bank.\n", ++errors);
+                warnsb.AppendFormat("W{0}: There should be exactly one Bank.\n", ++warnings);
 
             if (board.BoardData.Squares.Count > 0 && board.BoardData.Squares[0].SquareType != SquareType.Bank)
                 warnsb.AppendFormat("W{0}: The starting square (ID 0) should be a Bank.\n", ++warnings);
