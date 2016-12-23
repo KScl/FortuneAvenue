@@ -6,18 +6,18 @@
         xmlns:fsdata="clr-namespace:FSEditor.FSData;assembly=Lib"
         xmlns:local="clr-namespace:Editor"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        Name="WinA"
+        Name="EditorWindow"
         mc:Ignorable="d" 
         Title="Fortune Avenue"
-        Width="800"  Height="600"
-        MinWidth="800" MinHeight="600" 
+        Width="1024"  Height="768"
+        MinWidth="640" MinHeight="480" 
         d:DataContext="{d:DesignInstance Type=fsdata:BoardFile}"
         Loaded="Window_Loaded">
     <Window.Resources>
         <local:NullToFalseConverter x:Key="NullToFalseConverter"/>
         <local:ShopComboBoxConverter x:Key="ShopComboBoxConverter"/>
         <local:SquareComboBoxConverter x:Key="SquareComboBoxConverter"/>
-        <DrawingBrush x:Key="CanvasAxes">
+        <!-- <DrawingBrush x:Key="CanvasAxes">
             <DrawingBrush.Drawing>
                 <GeometryDrawing>
                     <GeometryDrawing.Geometry>
@@ -32,6 +32,7 @@
                 </GeometryDrawing>
             </DrawingBrush.Drawing>
         </DrawingBrush>
+        -->
     </Window.Resources>
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" Background="#ffebebeb" LastChildFill="False">
@@ -47,20 +48,20 @@
                     <MenuItem Header="Exit" Click="Exit_Click"/>
                 </MenuItem>
                 <MenuItem Header="Tools">
-                   <MenuItem Header="Create Paths" Click="Autopath_Click"/>
-                   <MenuItem Header="Verify Board" Click="Verify_Click"/>
+                    <MenuItem Header="Create Paths" Click="Autopath_Click"/>
+                    <MenuItem Header="Verify Board" Click="Verify_Click"/>
                 </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="Show Help Dialog" Click="Help_Click"/>
                     <MenuItem Header="About" Click="About_Click"/>
                 </MenuItem>
             </Menu>
-            <CheckBox x:Name="DrawAxes" DockPanel.Dock="Right" Width="79" Margin="4,0" VerticalAlignment="Center">Draw Axes</CheckBox>
+            <CheckBox x:Name="DrawAxesCheckBox" DockPanel.Dock="Right" Width="79" Margin="4,0" VerticalAlignment="Center" Checked="DrawAxesCheck" Unchecked="DrawAxesUncheck">Draw Axes</CheckBox>
             <Slider Name="PART_Zoom" Minimum=".1" Value="1" Maximum="3" Width="490" DockPanel.Dock="Right" Margin="4,0" ClipToBounds="False" />
             <TextBlock Text="{Binding ElementName=PART_Zoom, Path=Value, StringFormat=Zoom: \{0:P\}}" Margin="4,0"
                        VerticalAlignment="Center" DockPanel.Dock="Right" MouseLeftButtonDown="PART_ResetZoom" Width="75">
                 <TextBlock.ToolTip>
-                        <TextBlock>Click to reset zoom to 100%</TextBlock>
+                    <TextBlock>Click to reset zoom to 100%</TextBlock>
                 </TextBlock.ToolTip>
             </TextBlock>
         </DockPanel>
@@ -73,7 +74,8 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="129" />
                 <ColumnDefinition Width="429*" />
-                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="166" />
+                <ColumnDefinition Width="54"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
@@ -84,7 +86,7 @@
                     <TextBox Text="{Binding Path=InitialCash}" />
                 </HeaderedContentControl>
                 <HeaderedContentControl Header="Target Amount" Margin="2">
-                <TextBox Text="{Binding Path=TargetAmount}" />
+                    <TextBox Text="{Binding Path=TargetAmount}" />
                 </HeaderedContentControl>
                 <HeaderedContentControl Header="Base Salary" Margin="2">
                     <TextBox Text="{Binding Path=BaseSalary}" />
@@ -114,16 +116,16 @@
 
                 <HeaderedContentControl Header="Legend:" Margin="0,2,0,0" ClipToBounds="False">
                     <StackPanel>
-                    <Grid Width="64" Height="64">
-                        <Image Source="/Editor;component/Images/GroundProperty.png"/>
-                        <Border BorderBrush="Black" BorderThickness="1"/>
+                        <Grid Width="64" Height="64">
+                            <Image Source="/Editor;component/Images/GroundProperty.png"/>
+                            <Border BorderBrush="Black" BorderThickness="1"/>
                             <TextBlock Text="Value" HorizontalAlignment="Center" VerticalAlignment="Center"
                                        FontSize="16" Foreground="White" Background="#7F000000"/>
                             <TextBlock Text="Price" HorizontalAlignment="Center" VerticalAlignment="Bottom"
                                        FontSize="12" Foreground="White" Background="#7F000000"/>
                             <TextBlock Text="Id" HorizontalAlignment="Right" VerticalAlignment="Top"
                                        FontSize="12" Foreground="White" Background="#7F000000"/>
-                    </Grid>
+                        </Grid>
                         <TextBlock Text="Selected will have a white border." TextWrapping="Wrap" />
                         <TextBlock Text="Properties will show district color." TextWrapping="Wrap" />
                     </StackPanel>
@@ -163,13 +165,13 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBox">
-                                        <Border CornerRadius="2" 
+                                    <Border CornerRadius="2" 
 			                BorderBrush="{TemplateBinding BorderBrush}"
 			                BorderThickness="{TemplateBinding BorderThickness}">
-                                            <ScrollViewer x:Name="ScrollViewer" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="0">
-                                                <ItemsPresenter />
-                                            </ScrollViewer>
-                                        </Border>
+                                        <ScrollViewer x:Name="ScrollViewer" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="0">
+                                            <ItemsPresenter />
+                                        </ScrollViewer>
+                                    </Border>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
@@ -179,7 +181,7 @@
                     <ItemsPanelTemplate>
                         <local:DragCanvas IsItemsHost="True" 
                             Width="2048"
-                            Height="2048" x:Name="BoardCanvas" Background="{StaticResource CanvasAxes}">
+                            Height="2048" x:Name="BoardCanvas">
                             <local:DragCanvas.LayoutTransform>
                                 <ScaleTransform ScaleX="{Binding ElementName=PART_Zoom, Path=Value}"
                                                 ScaleY="{Binding ElementName=PART_Zoom, Path=Value}"/>
@@ -213,7 +215,7 @@
                                                 <Setter Property="BorderThickness" Value="3"/>
                                                 <Setter Property="BorderBrush" Value="{Binding DistrictDestinationId, Converter={StaticResource DistrictConverter}}"/>
                                             </DataTrigger>
-                                                <DataTrigger Binding="{Binding SquareType}" Value="{x:Static fsdata:SquareType.VacantPlot}">
+                                            <DataTrigger Binding="{Binding SquareType}" Value="{x:Static fsdata:SquareType.VacantPlot}">
                                                 <Setter Property="BorderThickness" Value="3"/>
                                                 <Setter Property="BorderBrush" Value="{Binding DistrictDestinationId, Converter={StaticResource DistrictConverter}}"/>
                                             </DataTrigger>
@@ -257,12 +259,12 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <HeaderedContentControl Header="Id" Grid.Column="2" Grid.Row="0" Margin="2,0,2,0">
+            <HeaderedContentControl Header="Id" Grid.Column="2" Grid.Row="0" Margin="2,0,2,0" Grid.ColumnSpan="2">
                 <TextBlock DataContext="{Binding ElementName=PART_Squares, Path=SelectedItem}" Text="{Binding Id}" FontWeight="Bold" Margin="4,0,0,0" />
             </HeaderedContentControl>
-            <TabControl Grid.Column="2" Grid.Row="1">
+            <TabControl Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="2">
                 <TabItem Header="Information">
-            <StackPanel DataContext="{Binding ElementName=PART_Squares, Path=SelectedItem}"
+                    <StackPanel DataContext="{Binding ElementName=PART_Squares, Path=SelectedItem}"
                         IsEnabled="{Binding Converter={StaticResource NullToFalseConverter}}">
 
 
@@ -292,31 +294,31 @@
                         <HeaderedContentControl Header="Shop Model" Margin="0,2,0,0">
                             <ComboBox Name="ShopComboBox" SelectedItem="{Binding ShopModelId, Converter={StaticResource ShopComboBoxConverter}, Mode=TwoWay}"/>
                         </HeaderedContentControl>
-            </StackPanel>
-                    
+                    </StackPanel>
+
                 </TabItem>
                 <TabItem Header="Waypoints">
-                <StackPanel DataContext="{Binding ElementName=PART_Squares, Path=SelectedItem}"
+                    <StackPanel DataContext="{Binding ElementName=PART_Squares, Path=SelectedItem}"
                         IsEnabled="{Binding Converter={StaticResource NullToFalseConverter}}">
-                <HeaderedContentControl Header="Waypoint 1" DataContext="{Binding Waypoint1}">
-                    <StackPanel Margin="4, 0,0,0">
-                        <HeaderedContentControl Header="Entry Square ID">
-                            <TextBox Text="{Binding EntryId}"/>
+                        <HeaderedContentControl Header="Waypoint 1" DataContext="{Binding Waypoint1}">
+                            <StackPanel Margin="4, 0,0,0">
+                                <HeaderedContentControl Header="Entry Square ID">
+                                    <TextBox Text="{Binding EntryId}"/>
+                                </HeaderedContentControl>
+                                <HeaderedContentControl Header="Destination Square IDs">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox Grid.Column="0" Text="{Binding Destination1}"/>
+                                        <TextBox Grid.Column="1" Text="{Binding Destination2}"/>
+                                        <TextBox Grid.Column="2" Text="{Binding Destination3}"/>
+                                    </Grid>
+                                </HeaderedContentControl>
+                            </StackPanel>
                         </HeaderedContentControl>
-                        <HeaderedContentControl Header="Destination Square IDs">
-                             <Grid>
-                                 <Grid.ColumnDefinitions>
-                                     <ColumnDefinition Width="*"/>
-                                     <ColumnDefinition Width="*"/>
-                                     <ColumnDefinition Width="*"/>
-                                 </Grid.ColumnDefinitions>
-                                 <TextBox Grid.Column="0" Text="{Binding Destination1}"/>
-                                 <TextBox Grid.Column="1" Text="{Binding Destination2}"/>
-                                 <TextBox Grid.Column="2" Text="{Binding Destination3}"/>
-                             </Grid>
-                        </HeaderedContentControl>
-                    </StackPanel>
-                </HeaderedContentControl>
                         <HeaderedContentControl Header="Waypoint 2" DataContext="{Binding Waypoint2}" Margin="0,8,0,0">
                             <StackPanel Margin="4, 0,0,0">
                                 <HeaderedContentControl Header="Entry Square ID">

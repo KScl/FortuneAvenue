@@ -668,6 +668,20 @@ namespace Editor
                 sab.IsEnabled = (Snap > 1);
         }
 
+        private void DrawAxesCheck(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = this.DrawAxesCheckBox;
+
+            // unimplemented
+        }
+
+        private void DrawAxesUncheck(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = this.DrawAxesCheckBox;
+
+            //unimplemented
+        }
+
         // Rounds x to a multiple of y.
         public static Int16 RoundBy(Int16 x, Int16 y)
         {
@@ -692,6 +706,49 @@ namespace Editor
             {
                 board.BoardInfo.GalaxyStatus = 1;
             }
+        }
+
+        private static Brush CanvasGrid(Rect bounds, Size tileSize)
+        {
+            var brushColor = Brushes.LightGray;
+            var brushThickness = 1.0;
+            var tileRect = new Rect(tileSize);
+
+            var gridDots = new DrawingBrush
+            {
+                Stretch = Stretch.None,
+                TileMode = TileMode.Tile,
+                Viewport = tileRect,
+                ViewportUnits = BrushMappingMode.Absolute,
+                Drawing = new GeometryDrawing
+                {
+                    Pen = new Pen(brushColor, brushThickness),
+                    Geometry = new GeometryGroup
+                    {
+                        Children = new GeometryCollection
+                        {
+                            new EllipseGeometry(tileRect.TopLeft, 1, 1)
+                        }
+                    }
+                }
+            };
+
+
+
+            var axesGrid = new DrawingBrush
+            {
+                Stretch = Stretch.None,
+                AlignmentX = AlignmentX.Center,
+                AlignmentY = AlignmentY.Center,
+                Transform = new TranslateTransform(bounds.Left, bounds.Top),
+                Drawing = new GeometryDrawing
+                {
+                    Geometry = new RectangleGeometry(new Rect(bounds.Size)),
+                    Brush = gridDots
+                }
+            };
+
+            return axesGrid;
         }
     }
 }
