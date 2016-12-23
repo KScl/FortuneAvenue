@@ -302,6 +302,52 @@ namespace Editor
 
         #region Tools Menu
 
+        // Corresponds to "Tools/Stock Prices"
+        private void StockPrices_Click(object sender, RoutedEventArgs e)
+        {
+            var board = ((BoardFile)this.DataContext);
+            if (board == null)
+                return;
+
+            Int32[] districtCount = new Int32[12];
+            Int32[] districtSum = new Int32[12];
+            Int32 highestDistrict = -1;
+
+            foreach(var square in board.BoardData.Squares)
+            {
+                if (square.DistrictDestinationId >= 12)
+                    continue; // ignore invalid districts
+                if (square.SquareType == SquareType.VacantPlot)
+                    districtSum[square.DistrictDestinationId] += 200; // Vacant lots are always 200g by default
+                else if (square.SquareType == SquareType.Property)
+                    districtSum[square.DistrictDestinationId] += square.Value;
+                else
+                    continue; // not a property
+
+                ++districtCount[square.DistrictDestinationId];
+                if (highestDistrict < square.DistrictDestinationId)
+                    highestDistrict = square.DistrictDestinationId;
+            }
+
+            StringBuilder stockssb = new StringBuilder();
+            for (Int32 i = 0; i <= highestDistrict; ++i)
+            {
+                if (districtCount[i] == 0)
+                    continue;
+
+                // The base stock value is just the average value of shops in that district
+                Int64 stpri = districtSum[i] / districtCount[i];
+
+                // Initial stock has a base multiplier of 0xB00 in 16.16 fixed point,
+                // so we simulate that
+                stpri *= 0x00000B00;
+                stpri >>= 16;
+
+                stockssb.AppendFormat("District {0}: {1}g\n", ((char)('A'+(char)i)).ToString(), stpri);
+            }
+            MessageBox.Show(stockssb.ToString(), "Stock Prices", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         // Corresponds to "Tools/Create Paths"
         // This is virtually unchanged from the original code base.
         private void Autopath_Click(object sender, RoutedEventArgs e)
@@ -397,7 +443,7 @@ namespace Editor
 
             MessageBox.Show("Autopathed entire map");
         }
-        
+
         // Corresponds to "Tools/Verify Board"
         private void Verify_Click(object sender, RoutedEventArgs e)
         {
@@ -415,8 +461,9 @@ namespace Editor
             Int32[] districts = new Int32[12];
             Int32 highestDistrict = -1;
 
+            // Clearly not a requirement
             if (board.BoardData.Squares.Count(t => t.SquareType == SquareType.Bank) != 1)
-                errsb.AppendFormat("E{0}: There must be exactly one Bank.\n", ++errors);
+                warnsb.AppendFormat("W{0}: There should be exactly one Bank.\n", ++warnings);
 
             if (board.BoardData.Squares.Count > 0 && board.BoardData.Squares[0].SquareType != SquareType.Bank)
                 warnsb.AppendFormat("W{0}: The starting square (ID 0) should be a Bank.\n", ++warnings);
@@ -441,6 +488,14 @@ namespace Editor
                     }
                 }
 
+                // Ignore waypoints for doors / one way alleys.
+                if (square.SquareType == SquareType.OneWayAlleySquare
+                    || square.SquareType == SquareType.OneWayAlleyDoorA
+                    || square.SquareType == SquareType.OneWayAlleyDoorB
+                    || square.SquareType == SquareType.OneWayAlleyDoorC
+                    || square.SquareType == SquareType.OneWayAlleyDoorD)
+                    continue;
+
                 for (int i = 0; i < 4; ++i)
                 {
                     //Entry
@@ -452,10 +507,10 @@ namespace Editor
                     else
                     {
                         var other = board.BoardData.Squares[square.Waypoints[i].EntryId];
-                        if (Math.Abs(square.Position.X - other.Position.X) > 64
-                            || Math.Abs(square.Position.Y - other.Position.Y) > 64)
+                        if (Math.Abs(square.Position.X - other.Position.X) > 96
+                            || Math.Abs(square.Position.Y - other.Position.Y) > 96)
                         {
-                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, EntryId references square {2} which is not touching\n", square.Id, i + 1, square.Waypoints[i].EntryId, ++warnings);
+                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, EntryId references square {2} which is too far away\n", square.Id, i + 1, square.Waypoints[i].EntryId, ++warnings);
                         }
                     }
 
@@ -468,10 +523,10 @@ namespace Editor
                     else
                     {
                         var other = board.BoardData.Squares[square.Waypoints[i].Destination1];
-                        if (Math.Abs(square.Position.X - other.Position.X) > 64
-                            || Math.Abs(square.Position.Y - other.Position.Y) > 64)
+                        if (Math.Abs(square.Position.X - other.Position.X) > 96
+                            || Math.Abs(square.Position.Y - other.Position.Y) > 96)
                         {
-                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, Destiniation1 references square {2} which is not touching\n", square.Id, i + 1, square.Waypoints[i].Destination1, ++warnings);
+                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, Destiniation1 references square {2} which is too far away\n", square.Id, i + 1, square.Waypoints[i].Destination1, ++warnings);
                         }
                     }
 
@@ -484,10 +539,10 @@ namespace Editor
                     else
                     {
                         var other = board.BoardData.Squares[square.Waypoints[i].Destination2];
-                        if (Math.Abs(square.Position.X - other.Position.X) > 64
-                            || Math.Abs(square.Position.Y - other.Position.Y) > 64)
+                        if (Math.Abs(square.Position.X - other.Position.X) > 96
+                            || Math.Abs(square.Position.Y - other.Position.Y) > 96)
                         {
-                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, Destination2 references square {2} which is not touching\n", square.Id, i + 1, square.Waypoints[i].Destination2, ++warnings);
+                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, Destination2 references square {2} which is too far away\n", square.Id, i + 1, square.Waypoints[i].Destination2, ++warnings);
                         }
                     }
 
@@ -500,10 +555,10 @@ namespace Editor
                     else
                     {
                         var other = board.BoardData.Squares[square.Waypoints[i].Destination3];
-                        if (Math.Abs(square.Position.X - other.Position.X) > 64
-                            || Math.Abs(square.Position.Y - other.Position.Y) > 64)
+                        if (Math.Abs(square.Position.X - other.Position.X) > 96
+                            || Math.Abs(square.Position.Y - other.Position.Y) > 96)
                         {
-                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, Destination3 references square {2} which is not touching\n", square.Id, i + 1, square.Waypoints[i].Destination3, ++warnings);
+                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, Destination3 references square {2} which is too far away\n", square.Id, i + 1, square.Waypoints[i].Destination3, ++warnings);
                         }
                     }
                 }
