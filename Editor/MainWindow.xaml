@@ -32,6 +32,7 @@
                     <MenuItem Header="Exit" Click="Exit_Click"/>
                 </MenuItem>
                 <MenuItem Header="Tools">
+                   <MenuItem Header="Stock Prices" Click="StockPrices_Click"/>
                    <MenuItem Header="Create Paths" Click="Autopath_Click"/>
                    <MenuItem Header="Verify Board" Click="Verify_Click"/>
                 </MenuItem>
