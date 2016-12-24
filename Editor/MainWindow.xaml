@@ -17,22 +17,7 @@
         <local:NullToFalseConverter x:Key="NullToFalseConverter"/>
         <local:ShopComboBoxConverter x:Key="ShopComboBoxConverter"/>
         <local:SquareComboBoxConverter x:Key="SquareComboBoxConverter"/>
-        <!-- <DrawingBrush x:Key="CanvasAxes">
-            <DrawingBrush.Drawing>
-                <GeometryDrawing>
-                    <GeometryDrawing.Geometry>
-                        <GeometryGroup>
-                            <LineGeometry StartPoint="0,1058" EndPoint="2048,1058" />
-                            <LineGeometry StartPoint="1061,0" EndPoint="1061,2048" />
-                        </GeometryGroup>
-                    </GeometryDrawing.Geometry>
-                    <GeometryDrawing.Pen>
-                        <Pen Thickness="1" Brush="Gray" />
-                    </GeometryDrawing.Pen>
-                </GeometryDrawing>
-            </DrawingBrush.Drawing>
-        </DrawingBrush>
-        -->
+        <DrawingBrush x:Key="CanvasGrid"/>
     </Window.Resources>
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" Background="#ffebebeb" LastChildFill="False">
@@ -182,7 +167,7 @@
                     <ItemsPanelTemplate>
                         <local:DragCanvas IsItemsHost="True" 
                             Width="2048"
-                            Height="2048" x:Name="BoardCanvas">
+                            Height="2048" x:Name="BoardCanvas" Background="{DynamicResource CanvasGrid}">
                             <local:DragCanvas.LayoutTransform>
                                 <ScaleTransform ScaleX="{Binding ElementName=PART_Zoom, Path=Value}"
                                                 ScaleY="{Binding ElementName=PART_Zoom, Path=Value}"/>

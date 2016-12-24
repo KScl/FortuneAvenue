@@ -144,6 +144,8 @@ namespace Editor
         public static Int16 Snap { get; private set; }
         private String currentFileName = null; // Includes position, used for File/Save
         private String loneFileName = null; // File name only, used for titlebar
+        private static Boolean backgroundAxesOn = false;
+        private static Brush backgroundBrush = Brushes.Transparent;
 
         public MainWindow()
         {
@@ -526,7 +528,7 @@ namespace Editor
                         if (Math.Abs(square.Position.X - other.Position.X) > 96
                             || Math.Abs(square.Position.Y - other.Position.Y) > 96)
                         {
-                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, Destiniation1 references square {2} which is too far away\n", square.Id, i + 1, square.Waypoints[i].Destination1, ++warnings);
+                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, Destination1 references square {2} which is too far away\n", square.Id, i + 1, square.Waypoints[i].Destination1, ++warnings);
                         }
                     }
 
@@ -725,16 +727,12 @@ namespace Editor
 
         private void DrawAxesCheck(object sender, RoutedEventArgs e)
         {
-            CheckBox cb = this.DrawAxesCheckBox;
-
-            // unimplemented
+            this.Resources["CanvasGrid"] = CanvasGrid(new Rect(0, 0, 2048, 2048), new Size(64, 64));
         }
 
         private void DrawAxesUncheck(object sender, RoutedEventArgs e)
         {
-            CheckBox cb = this.DrawAxesCheckBox;
-
-            //unimplemented
+            this.Resources["CanvasGrid"] = Brushes.Transparent;
         }
 
         // Rounds x to a multiple of y.
@@ -765,9 +763,10 @@ namespace Editor
 
         private static Brush CanvasGrid(Rect bounds, Size tileSize)
         {
-            var brushColor = Brushes.LightGray;
-            var brushThickness = 1.0;
+            var brushColor = Brushes.SlateGray;
+            var brushThickness = 2.0;
             var tileRect = new Rect(tileSize);
+
 
             var gridDots = new DrawingBrush
             {
@@ -777,18 +776,16 @@ namespace Editor
                 ViewportUnits = BrushMappingMode.Absolute,
                 Drawing = new GeometryDrawing
                 {
-                    Pen = new Pen(brushColor, brushThickness),
                     Geometry = new GeometryGroup
                     {
                         Children = new GeometryCollection
                         {
-                            new EllipseGeometry(tileRect.TopLeft, 1, 1)
+                            new RectangleGeometry(new Rect(tileRect.TopLeft, new Size(tileRect.Width / 2, tileRect.Height / 2))),
+                            new RectangleGeometry(new Rect(new Point(tileRect.Width / 2, tileRect.Height / 2), new Size(tileRect.Width / 2, tileRect.Height / 2)))
                         }
                     }
                 }
             };
-
-
 
             var axesGrid = new DrawingBrush
             {
@@ -798,7 +795,16 @@ namespace Editor
                 Transform = new TranslateTransform(bounds.Left, bounds.Top),
                 Drawing = new GeometryDrawing
                 {
-                    Geometry = new RectangleGeometry(new Rect(bounds.Size)),
+                    Pen = new Pen(brushColor, brushThickness),
+                    Geometry = new GeometryGroup
+                    {
+                        Children = new GeometryCollection
+                        {
+                            new RectangleGeometry(new Rect(bounds.Size)),
+                            new LineGeometry(new Point((bounds.Left + bounds.Right) / 2, bounds.Top), new Point((bounds.Left + bounds.Right) / 2, bounds.Bottom)),
+                            new LineGeometry(new Point(bounds.Left, (bounds.Top + bounds.Bottom) / 2), new Point(bounds.Right, (bounds.Top + bounds.Bottom) / 2))
+                        }
+                    },
                     Brush = gridDots
                 }
             };
