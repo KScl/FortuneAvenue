@@ -536,6 +536,6 @@ namespace Editor
 
 			#endregion // UpdateZOrder
 
-		#endregion // Private Helpers
-	}
+        #endregion // Private Helpers
+    }
 }

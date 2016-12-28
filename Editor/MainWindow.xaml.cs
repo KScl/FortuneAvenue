@@ -144,7 +144,9 @@ namespace Editor
         public static Int16 Snap { get; private set; }
         private String currentFileName = null; // Includes position, used for File/Save
         private String loneFileName = null; // File name only, used for titlebar
-        
+        private static Boolean backgroundAxesOn = false;
+        private static Brush backgroundBrush = Brushes.Transparent;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -164,7 +166,35 @@ namespace Editor
                 this.Title = "Fortune Avenue - [" + loneFileName + "]";
         }
 
+        private void UpdateGalaxyRadio()
+        {
+            var board = ((BoardFile)this.DataContext);
+
+            switch (board.BoardInfo.GalaxyStatus)
+            {
+                case 0:
+                    this.GalaxyNLoop.IsChecked = true;
+                    break;
+                case 1:
+                    this.GalaxyVHLoop.IsChecked = true;
+                    break;
+                case 2:
+                    this.GalaxyVLoop.IsChecked = true;
+                    break;
+                default:
+                    this.GalaxyNLoop.IsChecked = false;
+                    this.GalaxyVLoop.IsChecked = false;
+                    this.GalaxyVHLoop.IsChecked = false;
+                    break;
+            }
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            CenterScrollViewer();
+        }
+
+        private void CenterScrollViewer()
         {
             var border = (Border)VisualTreeHelper.GetChild(PART_Squares, 0);
 
@@ -193,6 +223,8 @@ namespace Editor
             var Board = BoardFile.LoadDefault();
             this.DataContext = Board;
             UpdateTitle();
+            UpdateGalaxyRadio();
+            CenterScrollViewer();
         }
 
         // Corresponds to "File/Open"
@@ -217,6 +249,8 @@ namespace Editor
                 this.DataContext = Board;
             }
             UpdateTitle();
+            UpdateGalaxyRadio();
+            CenterScrollViewer();
         }
 
         // Corresponds to "File/Save"
@@ -501,7 +535,7 @@ namespace Editor
                         if (Math.Abs(square.Position.X - other.Position.X) > 96
                             || Math.Abs(square.Position.Y - other.Position.Y) > 96)
                         {
-                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, Destiniation1 references square {2} which is too far away\n", square.Id, i + 1, square.Waypoints[i].Destination1, ++warnings);
+                            warnsb.AppendFormat("W{3}: Square {0}, Waypoint {1}, Destination1 references square {2} which is too far away\n", square.Id, i + 1, square.Waypoints[i].Destination1, ++warnings);
                         }
                     }
 
@@ -578,7 +612,8 @@ namespace Editor
         // Corresponds to "Help/About"
         private void About_Click(object sender, RoutedEventArgs e)
         {
-            // no-op
+            var aboutBox = new AboutBox();
+            aboutBox.ShowDialog();
         }
 
         #endregion //Help Menu
@@ -697,12 +732,91 @@ namespace Editor
                 sab.IsEnabled = (Snap > 1);
         }
 
+        private void DrawAxesCheck(object sender, RoutedEventArgs e)
+        {
+            this.Resources["CanvasGrid"] = CanvasGrid(new Rect(0, 0, 2048, 2048), new Size(64, 64));
+        }
+
+        private void DrawAxesUncheck(object sender, RoutedEventArgs e)
+        {
+            this.Resources["CanvasGrid"] = Brushes.Transparent;
+        }
+
         // Rounds x to a multiple of y.
         public static Int16 RoundBy(Int16 x, Int16 y)
         {
             if (x < 0)
                 return (short)(((x - (y / 2)) / y) * y);
             return (short)(((x + (y / 2)) / y) * y);
+        }
+
+        private void Galaxy_Click(object sender, RoutedEventArgs e)
+        {
+            var board = ((BoardFile)this.DataContext);
+
+            if ((bool)this.GalaxyNLoop.IsChecked)
+            {
+                board.BoardInfo.GalaxyStatus = 0;
+            }
+            else if ((bool)this.GalaxyVLoop.IsChecked)
+            {
+                board.BoardInfo.GalaxyStatus = 2;
+            }
+            else if ((bool)this.GalaxyVHLoop.IsChecked)
+            {
+                board.BoardInfo.GalaxyStatus = 1;
+            }
+        }
+
+        private static Brush CanvasGrid(Rect bounds, Size tileSize)
+        {
+            var brushColor = Brushes.SlateGray;
+            var brushThickness = 2.0;
+            var tileRect = new Rect(tileSize);
+
+
+            var gridDots = new DrawingBrush
+            {
+                Stretch = Stretch.None,
+                TileMode = TileMode.Tile,
+                Viewport = tileRect,
+                ViewportUnits = BrushMappingMode.Absolute,
+                Drawing = new GeometryDrawing
+                {
+                    Geometry = new GeometryGroup
+                    {
+                        Children = new GeometryCollection
+                        {
+                            new RectangleGeometry(new Rect(tileRect.TopLeft, new Size(tileRect.Width / 2, tileRect.Height / 2))),
+                            new RectangleGeometry(new Rect(new Point(tileRect.Width / 2, tileRect.Height / 2), new Size(tileRect.Width / 2, tileRect.Height / 2)))
+                        }
+                    }
+                }
+            };
+
+            var axesGrid = new DrawingBrush
+            {
+                Stretch = Stretch.None,
+                AlignmentX = AlignmentX.Center,
+                AlignmentY = AlignmentY.Center,
+                Transform = new TranslateTransform(bounds.Left, bounds.Top),
+                Drawing = new GeometryDrawing
+                {
+                    Pen = new Pen(brushColor, brushThickness),
+                    Geometry = new GeometryGroup
+                    {
+                        Children = new GeometryCollection
+                        {
+                            new RectangleGeometry(new Rect(bounds.Size)),
+                            new LineGeometry(new Point((bounds.Left + bounds.Right) / 2, bounds.Top), new Point((bounds.Left + bounds.Right) / 2, bounds.Bottom)),
+                            new LineGeometry(new Point(bounds.Left, (bounds.Top + bounds.Bottom) / 2), new Point(bounds.Right, (bounds.Top + bounds.Bottom) / 2))
+                        }
+                    },
+                    Brush = gridDots
+                }
+            };
+
+            return axesGrid;
         }
     }
 }

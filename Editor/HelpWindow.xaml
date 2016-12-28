@@ -134,7 +134,7 @@
                 <TextBlock Grid.Row="10" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="dolpic.frb" />
                 <TextBlock Grid.Row="10" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Delfino Plaza" />
 
-                <TextBlock Grid.Row="11" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="???.frb" />
+                <TextBlock Grid.Row="11" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="2-07-hidari.frb / o_peach.frb" />
                 <TextBlock Grid.Row="11" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Peach's Castle" />
 
                 <!-- Special -->
