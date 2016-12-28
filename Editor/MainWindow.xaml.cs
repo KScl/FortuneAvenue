@@ -191,6 +191,11 @@ namespace Editor
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            CenterScrollViewer();
+        }
+
+        private void CenterScrollViewer()
+        {
             var border = (Border)VisualTreeHelper.GetChild(PART_Squares, 0);
 
             // Get scrollviewer
@@ -219,6 +224,7 @@ namespace Editor
             this.DataContext = Board;
             UpdateTitle();
             UpdateGalaxyRadio();
+            CenterScrollViewer();
         }
 
         // Corresponds to "File/Open"
@@ -244,6 +250,7 @@ namespace Editor
             }
             UpdateTitle();
             UpdateGalaxyRadio();
+            CenterScrollViewer();
         }
 
         // Corresponds to "File/Save"

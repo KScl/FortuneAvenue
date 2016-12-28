@@ -179,6 +179,10 @@
                     <Style TargetType="ListBoxItem">
                         <Setter Property="Canvas.Left" Value="{Binding Position.X, Converter={StaticResource OffsetConverter}, ConverterParameter=1024, Mode=TwoWay}"/>
                         <Setter Property="Canvas.Top" Value="{Binding Position.Y, Converter={StaticResource OffsetConverter}, ConverterParameter=1024, Mode=TwoWay}"/>
+                        <Setter Property="Width" Value="64"/>
+                        <Setter Property="Height" Value="64"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="Padding" Value="0"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
